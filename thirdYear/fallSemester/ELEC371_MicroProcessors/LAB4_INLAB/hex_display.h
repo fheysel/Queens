@@ -1,0 +1,1 @@
+#define HEXDISPLAY	((volatile unsigned int *) 0x10000020)
