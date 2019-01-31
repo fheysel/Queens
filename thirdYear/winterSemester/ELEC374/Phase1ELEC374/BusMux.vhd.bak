@@ -1,0 +1,40 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+
+--  Entity Declaration
+
+ENTITY multiplexer IS
+-- {{ALTERA_IO_BEGIN}} DO NOT REMOVE THIS LINE!
+PORT
+(
+U  : IN STD_LOGIC_VECTOR(2 downto 0);
+V  : IN STD_LOGIC_VECTOR(2 downto 0);
+W  : IN STD_LOGIC_VECTOR(2 downto 0);
+X  : IN STD_LOGIC_VECTOR(2 downto 0);
+Y  : IN STD_LOGIC_VECTOR(2 downto 0);
+S  : IN STD_LOGIC_VECTOR(2 downto 0);
+CS : IN STD_LOGIC;
+M  : OUT STD_LOGIC_VECTOR(2 downto 0)
+);
+-- {{ALTERA_IO_END}} DO NOT REMOVE THIS LINE!
+
+END multiplexer;
+
+architecture multiplexer_architecture of multiplexer is
+begin
+    process(cs, s, u, v, w, x, y)
+    begin
+        if cs = '1' then
+            case S is
+                when "000"  => m <= u;
+                when "001"  => m <= v;
+                when "010"  => m <= w;
+                when "011"  => m <= x;
+                when others => m <= y;
+            end case;
+        else
+            m <= "ZZZ";
+        end if;
+    end process;
+end architecture;
