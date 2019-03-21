@@ -1,0 +1,3 @@
+BUGS
+RESLOVED! If hotword is detected but no move stated, the turn goes to next player. When the next move is stated, it is a "not your turn" error and the program crashes
+RESLOVED! Linear check_path allows for pieces to move through each other

@@ -1,0 +1,110 @@
+use companydb;
+
+#Question 1	
+SELECT FNAME, LNAME, PNAME 
+FROM employee, project, works_on
+WHERE (LNAME = "Wong" OR LNAME = "English" OR LNAME = "English" OR LNAME = "Borg")
+	AND SSN = ESSN
+    AND PNO = PNumber ;
+	
+#Question 2
+SELECT DISTINCT FNAME, LNAME
+FROM employee, dependent
+WHERE SSN = ESSN
+AND relationship IN ('Daughter', 'Son') ;
+
+#Question 3
+SELECT pLocation as Location, PName, COUNT(DISTINCT works_on.essn) as numEmployees
+FROM deptlocations, project, works_on
+WHERE DNumber = DNum
+AND PNo = PNumber
+GROUP BY PNO ;
+
+#Question 4
+SELECT DISTINCT PName, PNumber 
+		 FROM (
+             	(SELECT SSN, PName, PNumber
+             	 FROM employee, works_on, project
+                 WHERE employee.LName = 'Narayan'
+                 AND employee.SSN = works_on.ESSN
+                 AND project.PNumber = works_on.PNo
+         		 ) AS NaryansProjects
+             
+              NATURAL JOIN
+             	
+             	(SELECT SSN, PName, PNumber
+                 FROM employee, works_on, project
+                 WHERE employee.LName = 'Jabbar'
+                 AND employee.SSN = works_on.ESSN
+                 AND works_on.PNo = project.PNumber
+                ) AS JabbarsProjects
+             ) ;
+         
+					  
+#Question 5
+SELECT FName, LName, year(now()) - year(dependent.BDate) as dependantsAge
+FROM dependent, employee
+WHERE employee.ssn = dependent.essn 
+AND dependent.Bdate > '1970-12-31'	;
+
+#Question 6 
+SELECT FNAME, LNAME, PName, Hours
+FROM employee, project, works_on
+WHERE project.PLocation = 'Sugarland'
+AND project.PNumber = works_on.PNo
+AND works_on.ESSN = employee.SSN ;
+
+#Question 7
+SELECT DISTINCT empFName, empLName, superFName, superLName
+FROM (
+        (SELECT SSN as employeeSSN, FName as empFName, LName as empLName, superSSN
+         FROM employee
+         ) as employeeNumbers
+    
+    	LEFT JOIN 
+    	
+    	(SELECT SSN, FName as superFName, LName as superLName
+     	 FROM employee
+     	)as superNumbers
+    	
+    	ON (employeeNumbers.superSSN = superNumbers.SSN)
+    ) ;
+	
+#Question 8 
+SELECT PName, FName, LName, PLocation
+FROM employee, department, project
+WHERE employee.SSN = department.MGRSSN
+AND department.DNumber = project.DNum ;
+
+#Question 9
+SELECT FNAME, LNAME, SSN as HighestEarningEmployee
+FROM employee 
+WHERE Salary in (SELECT MAX(Salary)	FROM employee) ;
+
+
+#Question 10
+SELECT FName, LName
+FROM employee, department
+WHERE employee.SSN = department.MGRSSN
+AND employee.Salary = (SELECT Max(Salary) as Salary FROM employee) ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

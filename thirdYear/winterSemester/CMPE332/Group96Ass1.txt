@@ -1,0 +1,169 @@
+/*
+ASSUMPTIONS
+Not every student is assigned a room.
+
+This conference runs over 2 days with 8 hours of speaker sessions each day.
+Speaker sessions are all one hour in length.
+Speaker sessions can have more than one speaker.
+
+No company is advertising a job with a salary over $9 999 999.99
+
+Every committee must have a chair.
+Note the requirements state that committee members must be able to be listed sperately from  the rest of the attendees. We assume this comes into effect with select functions and is not represented in 
+our entity-relationship model with a 3-level heirarchy of (people)-> (committee members)
+																  `> (attendee) -> (student)
+																				`> (professional)
+																				`> (sponsor)
+																				`> (speaker)
+Every student number is greater than zero and less than 2147483647.
+*/
+
+DROP DATABASE IF EXISTS Confrence;
+CREATE DATABASE Confrence;
+USE Confrence;
+
+CREATE TABLE room (
+	number int not null PRIMARY KEY,
+	numBeds enum('1', '2') not null
+);
+
+CREATE TABLE student(
+	email varchar(30) not null PRIMARY KEY,
+	fname varchar(30) not null,
+	lname varchar(30) not null,
+	studentNum int not null,
+	schoolName varchar(30) not null
+);
+
+CREATE TABLE hotelList (
+	studentEmail varchar(30) not null PRIMARY KEY,
+	roomNumber int not null,
+	FOREIGN KEY (studentEmail) references student(email) ON DELETE CASCADE,
+	FOREIGN KEY (roomNumber) references room(number) ON DELETE CASCADE
+);
+	
+
+CREATE TABLE professional(
+	email varchar(30) not null PRIMARY KEY,
+	fname varchar(30) not null,
+	lname varchar(30) not null
+);
+
+CREATE TABLE speaker(
+	email varchar(30) not null PRIMARY KEY,
+	fname varchar(30) not null,
+	lname varchar(30) not null,
+	field varchar(60)
+);
+
+CREATE TABLE notableAwards(
+	email varchar(30) not null,
+	award varchar(60) not null,
+	PRIMARY KEY(email, award),
+	FOREIGN KEY (email) references speaker(email)
+);
+
+CREATE TABLE speakerSession (
+	block enum('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') not null,
+	roomNumber int not null,
+	name varchar(30),
+	PRIMARY KEY(block, roomNumber)
+);
+
+CREATE TABLE speaksAt(
+	speakerEmail varchar(30) not null,
+	sessionBlock enum('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F') not null,
+	sessionRoom int not null,
+	PRIMARY KEY (speakerEmail, sessionBlock, sessionRoom),
+	FOREIGN KEY (speakerEmail) references speaker(email) ON DELETE CASCADE,
+	FOREIGN KEY (sessionBlock) references speakerSession(block) ON DELETE CASCADE,
+	FOREIGN KEY (sessionRoom) references speakerSession(roomNumber) ON DELETE CASCADE
+);
+
+CREATE TABLE company(
+	name varchar(30) not null PRIMARY KEY,
+	sponsorship enum('Platinum', 'Gold', 'Silver', 'Bronze') not null,
+	emailsSent int
+);
+
+CREATE TABLE sponsor(
+	email varchar(30) not null PRIMARY KEY,
+	fname varchar(30) not null,
+	lname varchar(30) not null,
+	companyName varchar(30) not null,
+	FOREIGN KEY (companyName) references company(name) ON DELETE CASCADE
+);
+	
+CREATE TABLE advert(
+	jobTitle varchar(30) not null,
+	companyName varchar(30) not null,
+	city varchar(30) not null,
+	prov varchar(30) not null,
+	salary float(9,2),
+	FOREIGN KEY (companyName) references company(name) ON DELETE CASCADE
+);
+
+CREATE TABLE committeeMember(
+	email varchar(30) not null PRIMARY KEY,
+	fname varchar(30) not null,
+	lname varchar(30) not null
+);
+
+CREATE TABLE committee(
+	name varchar(60) not null PRIMARY KEY,
+	chairEmail varchar(30) not null,
+	FOREIGN KEY (chairEmail) references committeeMember(email) ON DELETE RESTRICT
+);
+
+CREATE TABLE memberIsOn(
+	memberEmail varchar(30) not null,
+	committeeName varchar(60) not null,
+	PRIMARY KEY(memberEmail, committeeName),
+	FOREIGN KEY(memberEmail) references committeeMember(email) ON DELETE CASCADE,
+	FOREIGN KEY(committeeName) references committee(name) ON DELETE CASCADE
+);
+
+INSERT INTO student(email, fname, lname, studentNum, schoolName) VALUES ('test1@email.com', 'harry', 'potter', 693001, 'Pigfarts');
+INSERT INTO student(email, fname, lname, studentNum, schoolName) VALUES ('test2@email.com', 'hermione', 'granger', 420911, 'Hogwarts');
+INSERT INTO student(email, fname, lname, studentNum, schoolName) VALUES ('test3@email.com', 'ronald', 'weasley', 102455, 'Hogwarts');
+
+INSERT INTO room(number, numBeds) VALUES (101, 1);
+INSERT INTO room(number, numBeds) VALUES (102, 2);
+
+INSERT INTO hotelList(studentEmail, roomNumber) VALUES ('test1@email', 101);
+INSERT INTO hotelList(studentEmail, roomNumber) VALUES ('test2@email', 102);
+INSERT INTO hotelList(studentEmail, roomNumber) VALUES ('test3@email', 102);
+
+INSERT INTO professional(email, fname, lname) VALUES ('test4@email', 'albus', 'dumbledore');
+INSERT INTO professional(email, fname, lname) VALUES ('test5@email', 'minerva', 'mcgonagall');
+INSERT INTO professional(email, fname, lname) VALUES ('test6@email', 'rubeus', 'hagrid');
+INSERT INTO professional(email, fname, lname) VALUES ('test11@email', 'rita', 'skeeter');
+
+INSERT INTO speaker(email, fname, lname, field) VALUES ('test7@email', 'gilderoy', 'lockhart', 'Defense Against the Dark Arts');
+INSERT INTO speaker(email, fname, lname, field) VALUES ('test8@email', 'nicholas', 'flammel', 'Alchemy');
+INSERT INTO speaker(email, fname, lname, field) VALUES ('test9@email', 'bathilda', 'bagshot', 'History of Magic');
+
+INSERT INTO notableAwards(email, award) VALUES ('test7@email', 'Witch Weeklys Most Charming Smile Award');
+
+INSERT INTO speakerSession(block, roomNumber, name) VALUES (1, 101, 'Victories against Vampires');
+INSERT INTO speakerSession(block, roomNumber, name) VALUES (1, 102, 'The Immortal Life');
+INSERT INTO speakerSession(block, roomNumber, name) VALUES (1, 103, 'Hogwarts a History');
+
+INSERT INTO speaksAt(speakerEmail, sessionBlock, sessionRoom) VALUES('test7@email', '0', 205);
+INSERT INTO speaksAt(speakerEmail, sessionBlock, sessionRoom) VALUES('test8@email', '0', 206);
+INSERT INTO speaksAt(speakerEmail, sessionBlock, sessionRoom) VALUES('test9@email', 'f', 102);
+
+INSERT INTO company(name, sponsorship, emailsSent) VALUES('Weasleys Wizard Wheezes', 'Gold', '20');
+
+INSERT INTO sponsor(email, fname, lname, companyName) VALUES('test10@email', 'Fred', 'Weasley', 'Weasleys Wizard Wheezes');
+INSERT INTO sponsor(email, fname, lname, companyName) VALUES('test11@email', 'George', 'Weasley', 'Weasleys Wizard Wheezes');
+
+INSERT INTO advert(jobTitle, companyName, city, prov, salary) VALUES('Wildfire Whizbang Developer', 'Weasleys Wizard Wheezes', 'Diagon Alley', 'London', 100000.00);
+
+INSERT INTO committeeMember(email, fname, lname) VALUES ('test2@email.com', 'hermione', 'granger');
+INSERT INTO committeeMember(email, fname, lname) VALUES ('test12@email.com', 'winky', 'the elf');
+
+INSERT INTO committee(name, chairEmail) VALUES ('society for the promotion of elfish welfare', 'test2@email.com'); 
+
+INSERT INTO memberIsOn(memberEmail, committeeName) VALUES ('test2@email.com', 'society for the promotion of elfish welfare');
+INSERT INTO memberIsOn(memberEmail, committeeName) VALUES ('test12@email.com', 'society for the promotion of elfish welfare');
