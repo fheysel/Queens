@@ -2,7 +2,7 @@
  * insultgenerator_15tjh2.cpp
  *
  *  Created on: Sep 26, 2018
- *      Author: Tom Heysel
+ *      Author: Fiona Heysel
  *      NetID: 15tjh2
  *
  */
