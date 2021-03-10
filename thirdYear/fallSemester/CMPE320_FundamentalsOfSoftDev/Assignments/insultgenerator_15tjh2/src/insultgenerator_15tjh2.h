@@ -2,7 +2,7 @@
  * insultgenerator_15tjh2.h
  *
  *  Created on: Sep 26, 2018
- *      Author: Tom Heysel
+ *      Author: Fiona Heysel
  *      NetID: 15tjh2
  */
 #pragma once
